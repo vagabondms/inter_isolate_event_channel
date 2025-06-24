@@ -30,9 +30,4 @@ class InterIsolateEventChannel {
       return false;
     }).map((event) => event['payload']);
   }
-
-  /// 모든 이벤트에 대한 스트림을 반환합니다.
-  static Stream<Map<String, dynamic>> get onAll {
-    return _broadcastStream.cast<Map<String, dynamic>>();
-  }
 }

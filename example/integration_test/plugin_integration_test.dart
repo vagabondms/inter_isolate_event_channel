@@ -18,7 +18,6 @@ void main() {
       (WidgetTester tester) async {
     // 이벤트 채널이 초기화되는지 확인
     expect(InterIsolateEventChannel.on('test.event'), isA<Stream>());
-    expect(InterIsolateEventChannel.onAll, isA<Stream>());
 
     // emit 메서드가 예외 없이 실행되는지 확인
     await expectLater(

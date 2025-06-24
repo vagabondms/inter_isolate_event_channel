@@ -19,6 +19,5 @@ void main() {
   test('InterIsolateEventChannel has static methods', () {
     expect(InterIsolateEventChannel.emit, isA<Function>());
     expect(InterIsolateEventChannel.on, isA<Function>());
-    expect(InterIsolateEventChannel.onAll, isA<Stream>());
   });
 }

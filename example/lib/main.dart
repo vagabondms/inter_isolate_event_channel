@@ -27,7 +27,7 @@ class _MyAppState extends State<MyApp> {
     super.initState();
 
     // 모든 이벤트 구독
-    InterIsolateEventChannel.onAll.listen((event) {
+    InterIsolateEventChannel.on('call.invite').listen((event) {
       final log = '수신: ${event['eventType']} - ${event['payload']}';
       _eventController.add(log);
     });
