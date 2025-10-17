@@ -1,6 +1,6 @@
 name: inter_isolate_event_channel
 description: "Flutter plugin for broadcasting events across multiple isolates/engines via native platform channels."
-version: 1.0.0
+version: 1.0.1
 homepage: https://github.com/minseok-joel/inter_isolate_event_channel
 repository: https://github.com/minseok-joel/inter_isolate_event_channel
 issue_tracker: https://github.com/minseok-joel/inter_isolate_event_channel/issues

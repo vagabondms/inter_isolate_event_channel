@@ -1,3 +1,10 @@
+## 1.0.1
+
+### Documentation
+
+* **README**: Translated all Korean content to English for international accessibility
+* **Documentation**: Removed "Future Development" section from README
+
 ## 1.0.0
 
 ### 🎉 First Stable Release

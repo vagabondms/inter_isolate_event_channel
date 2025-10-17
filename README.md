@@ -3,133 +3,133 @@
 [![pub package](https://img.shields.io/pub/v/inter_isolate_event_channel.svg)](https://pub.dev/packages/inter_isolate_event_channel)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-Flutter 멀티엔진/멀티 isolate 환경에서 이벤트를 네이티브 레이어를 통해 브로드캐스트하여 전체 엔진에 전파하는 이벤트 채널 플러그인입니다.
+A Flutter plugin for broadcasting events across multiple isolates/engines through the native layer.
 
-## 주요 기능
+## Features
 
-- ✅ 한 isolate/engine에서 발생한 이벤트를 모든 다른 isolate/engine에 브로드캐스트
-- ✅ 이벤트 타입 기반 필터링 지원
-- ✅ **타입 안전성**: Generic을 통한 컴파일 타임 타입 체크
-- ✅ **JSON 직렬화 검증**: emit 시점에 페이로드 검증
-- ✅ 네이티브 레이어(Android/iOS)를 통한 효율적인 이벤트 라우팅
-- ✅ 메모리 누수 방지를 위한 적절한 리소스 관리
-- ✅ Platform Interface 패턴 준수
-- ✅ 포괄적인 에러 처리
+- ✅ **Event Broadcasting**: Broadcast events from one isolate/engine to all other isolates/engines
+- ✅ **Event Type Filtering**: Subscribe to specific event types
+- ✅ **Type Safety**: Generic type parameters with compile-time type checking
+- ✅ **JSON Validation**: Automatic payload validation at emit time
+- ✅ **Efficient Routing**: Event routing through native layer (Android/iOS)
+- ✅ **Memory Safety**: Proper resource management to prevent memory leaks
+- ✅ **Platform Interface Pattern**: Well-structured plugin architecture
+- ✅ **Comprehensive Error Handling**: Clear error messages and exceptions
 
-## 사용 사례
+## Use Cases
 
-이 플러그인은 다음과 같은 상황에서 유용합니다:
+This plugin is useful in the following scenarios:
 
-- **멀티 엔진 Flutter 앱**: 네이티브 앱 내에 여러 Flutter 엔진이 있는 경우
-- **Add-to-App 시나리오**: 기존 네이티브 앱에 Flutter를 통합한 경우
-- **백그라운드 isolate 통신**: 백그라운드에서 실행되는 isolate와 UI isolate 간 이벤트 공유
-- **실시간 알림**: 한 화면의 이벤트를 다른 모든 화면에 즉시 전파
+- **Multi-Engine Flutter Apps**: Multiple Flutter engines within a native app
+- **Add-to-App Scenarios**: Integrating Flutter into existing native apps
+- **Background Isolate Communication**: Sharing events between background and UI isolates
+- **Real-time Notifications**: Instantly propagating events from one screen to all others
 
-## 설치
+## Installation
 
-`pubspec.yaml`에 다음을 추가하세요:
+Add this to your `pubspec.yaml`:
 
 ```yaml
 dependencies:
-  inter_isolate_event_channel: ^0.0.1
+  inter_isolate_event_channel: ^1.0.1
 ```
 
-그리고 패키지를 설치합니다:
+Then install packages:
 
 ```bash
 flutter pub get
 ```
 
-## 사용 방법
+## Usage
 
-### 기본 사용법
+### Basic Usage
 
-#### 이벤트 발생
+#### Emitting Events
 
 ```dart
 import 'package:inter_isolate_event_channel/inter_isolate_event_channel.dart';
 
-// 이벤트 발생
+// Emit an event
 await InterIsolateEventChannel.emit(
   'call.invite',
   {'callerId': 'user123', 'callerName': 'Alice'}
 );
 ```
 
-#### 이벤트 구독
+#### Subscribing to Events
 
 ```dart
 import 'package:inter_isolate_event_channel/inter_isolate_event_channel.dart';
 
-// 특정 이벤트 타입 구독 (Generic으로 타입 안전성 확보)
+// Subscribe to a specific event type with Generic for type safety
 final subscription = InterIsolateEventChannel.on<Map<String, dynamic>>('call.invite').listen((payload) {
-  // payload는 자동으로 Map<String, dynamic> 타입
-  print('통화 초대 수신: ${payload['callerName']}');
-  final callerId = payload['callerId']; // 타입 안전!
+  // payload is automatically typed as Map<String, dynamic>
+  print('Call invite received: ${payload['callerName']}');
+  final callerId = payload['callerId']; // Type safe!
 });
 
-// 구독 취소 (메모리 누수 방지)
+// Cancel subscription to prevent memory leaks
 await subscription.cancel();
 ```
 
-### 타입 안전성
+### Type Safety
 
-#### Generic 타입 지정
+#### Generic Type Specification
 
-Generic 타입을 지정하면 컴파일 타임에 타입 체크를 받을 수 있습니다:
+Specify generic types for compile-time type checking:
 
 ```dart
-// Map 타입으로 지정
+// Map type
 InterIsolateEventChannel.on<Map<String, dynamic>>('user.login').listen((payload) {
-  String userId = payload['userId']; // 타입 안전!
+  String userId = payload['userId']; // Type safe!
   String name = payload['name'];
 });
 
-// String 타입으로 지정
+// String type
 InterIsolateEventChannel.on<String>('message.text').listen((message) {
-  print(message.toUpperCase()); // String 메서드 사용 가능
+  print(message.toUpperCase()); // String methods available
 });
 
-// int 타입으로 지정
+// int type
 InterIsolateEventChannel.on<int>('counter.update').listen((count) {
-  print(count * 2); // int 연산 가능
+  print(count * 2); // int operations available
 });
 
-// List 타입으로 지정
+// List type
 InterIsolateEventChannel.on<List<dynamic>>('tags.updated').listen((tags) {
-  print(tags.length); // List 메서드 사용 가능
+  print(tags.length); // List methods available
 });
 ```
 
-#### 타입 불일치 처리
+#### Type Mismatch Handling
 
-타입이 일치하지 않는 이벤트는 자동으로 스킵됩니다:
+Events with mismatched payload types are automatically skipped:
 
 ```dart
-// String 타입만 받는 리스너
+// String-only listener
 InterIsolateEventChannel.on<String>('mixed.event').listen((message) {
-  print('문자 메시지: $message');
+  print('Text message: $message');
 });
 
-// int 타입만 받는 리스너
+// int-only listener
 InterIsolateEventChannel.on<int>('mixed.event').listen((number) {
-  print('숫자: $number');
+  print('Number: $number');
 });
 
-// 다양한 타입 발송
-await InterIsolateEventChannel.emit('mixed.event', 'Hello'); // String 리스너만 수신
-await InterIsolateEventChannel.emit('mixed.event', 42);       // int 리스너만 수신
-await InterIsolateEventChannel.emit('mixed.event', {'key': 'value'}); // 둘 다 스킵
+// Send various types
+await InterIsolateEventChannel.emit('mixed.event', 'Hello'); // String listener receives
+await InterIsolateEventChannel.emit('mixed.event', 42);       // int listener receives
+await InterIsolateEventChannel.emit('mixed.event', {'key': 'value'}); // Both skip
 ```
 
-개발 모드에서는 타입 불일치 시 경고가 출력됩니다.
+In debug mode, a warning is printed when type mismatches occur.
 
-### 고급 사용 예제
+### Advanced Examples
 
-#### 실시간 채팅 메시지 브로드캐스트
+#### Real-time Chat Message Broadcasting
 
 ```dart
-// Engine 1: 메시지 발송
+// Engine 1: Send message
 await InterIsolateEventChannel.emit('chat.message', {
   'roomId': 'room123',
   'message': 'Hello!',
@@ -137,7 +137,7 @@ await InterIsolateEventChannel.emit('chat.message', {
   'timestamp': DateTime.now().toIso8601String(),
 });
 
-// Engine 2, 3, 4...: 메시지 수신 (타입 안전)
+// Engine 2, 3, 4...: Receive message (type safe)
 InterIsolateEventChannel.on<Map<String, dynamic>>('chat.message').listen((payload) {
   if (payload['roomId'] == currentRoomId) {
     displayMessage(payload['message'], payload['sender']);
@@ -145,25 +145,25 @@ InterIsolateEventChannel.on<Map<String, dynamic>>('chat.message').listen((payloa
 });
 ```
 
-#### 상태 동기화
+#### State Synchronization
 
 ```dart
-// 로그인 상태 변경 브로드캐스트
+// Broadcast login state change
 await InterIsolateEventChannel.emit('auth.login', {
   'userId': 'user789',
   'token': 'jwt_token_here',
 });
 
-// 모든 화면에서 로그인 상태 업데이트
+// Update login state on all screens
 InterIsolateEventChannel.on('auth.login').listen((payload) {
   updateAuthState(payload['userId'], payload['token']);
 });
 
-// 로그아웃
+// Logout
 await InterIsolateEventChannel.emit('auth.logout', null);
 ```
 
-## 작동 원리
+## How It Works
 
 ```
 ┌─────────────┐         ┌──────────────────┐         ┌─────────────┐
@@ -176,33 +176,33 @@ await InterIsolateEventChannel.emit('auth.logout', null);
                                └────────────────────▶ Isolate E
 ```
 
-1. **이벤트 발생**: `emit()` 메서드가 `MethodChannel`을 통해 네이티브 레이어로 이벤트 전송
-2. **네이티브 브로드캐스트**: 싱글톤 브로드캐스터가 모든 등록된 EventSink에 이벤트 전달
-3. **이벤트 수신**: 각 isolate가 `EventChannel`을 통해 브로드캐스트 스트림을 구독
-4. **필터링**: Dart 레이어에서 `on()` 메서드로 이벤트 타입별 필터링
+1. **Event Emission**: The `emit()` method sends events to the native layer via `MethodChannel`
+2. **Native Broadcasting**: The singleton broadcaster forwards events to all registered EventSinks
+3. **Event Reception**: Each isolate subscribes to the broadcast stream via `EventChannel`
+4. **Filtering**: The Dart layer filters events by type using the `on()` method
 
-## API 레퍼런스
+## API Reference
 
 ### `InterIsolateEventChannel.emit(String eventType, dynamic payload)`
 
-이벤트를 모든 isolate/engine에 브로드캐스트합니다.
+Broadcasts an event to all isolates/engines.
 
 **Parameters:**
-- `eventType` (String): 이벤트 유형 식별자 (예: 'call.invite', 'message.new')
-- `payload` (dynamic): 전송할 데이터 (JSON 직렬화 가능해야 함)
-  - 지원 타입: `null`, `bool`, `num` (int, double), `String`, `List`, `Map`
-  - `List`와 `Map`은 재귀적으로 검증됩니다
-  - `Map`의 키는 반드시 `String`이어야 합니다
+- `eventType` (String): Event type identifier (e.g., 'call.invite', 'message.new')
+- `payload` (dynamic): Data to send (must be JSON-serializable)
+  - Supported types: `null`, `bool`, `num` (int, double), `String`, `List`, `Map`
+  - `List` and `Map` are validated recursively
+  - `Map` keys must be `String`
 
 **Returns:** `Future<void>`
 
 **Throws:**
-- `ArgumentError`: eventType이 비어있거나 payload가 JSON 직렬화 불가능한 경우
-- `PlatformException`: 네이티브 플랫폼에서 에러 발생 시
+- `ArgumentError`: If eventType is empty or payload is not JSON-serializable
+- `PlatformException`: If the native platform encounters an error
 
 **Examples:**
 ```dart
-// 올바른 페이로드
+// Valid payloads
 await InterIsolateEventChannel.emit('event', null);
 await InterIsolateEventChannel.emit('event', 'text');
 await InterIsolateEventChannel.emit('event', 42);
@@ -213,58 +213,58 @@ await InterIsolateEventChannel.emit('event', {
   'list': ['a', 'b', 'c'],
 });
 
-// 잘못된 페이로드 (ArgumentError 발생)
+// Invalid payloads (throws ArgumentError)
 await InterIsolateEventChannel.emit('event', DateTime.now()); // ❌
 await InterIsolateEventChannel.emit('event', MyCustomClass()); // ❌
-await InterIsolateEventChannel.emit('event', {1: 'value'}); // ❌ 키가 String이 아님
+await InterIsolateEventChannel.emit('event', {1: 'value'}); // ❌ Non-String key
 ```
 
 ### `InterIsolateEventChannel.on<T>(String eventType)`
 
-특정 이벤트 타입에 대한 스트림을 반환합니다.
+Returns a stream for a specific event type.
 
 **Type Parameters:**
-- `T`: payload의 예상 타입 (기본값: `dynamic`)
-  - 타입 안전성을 위해 명시적으로 지정하는 것을 권장합니다
-  - 타입이 일치하지 않는 이벤트는 자동으로 스킵됩니다
+- `T`: Expected payload type (default: `dynamic`)
+  - Explicitly specifying the type is recommended for type safety
+  - Events with mismatched types are automatically skipped
 
 **Parameters:**
-- `eventType` (String): 구독할 이벤트 유형
+- `eventType` (String): Event type to subscribe to
 
-**Returns:** `Stream<T>` - 해당 이벤트의 payload만 포함 (타입 `T`로 캐스팅됨)
+**Returns:** `Stream<T>` - Stream containing only the payload (cast to type `T`)
 
 **Throws:**
-- `ArgumentError`: eventType이 비어있는 경우
+- `ArgumentError`: If eventType is empty
 
 **Examples:**
 ```dart
-// Generic 타입 지정 (권장)
+// With Generic type (recommended)
 InterIsolateEventChannel.on<Map<String, dynamic>>('user.login').listen((payload) {
-  String userId = payload['userId']; // 타입 안전
+  String userId = payload['userId']; // Type safe
 });
 
-// Generic 미지정
+// Without Generic
 InterIsolateEventChannel.on('user.login').listen((payload) {
-  // payload는 dynamic
+  // payload is dynamic
 });
 ```
 
-## 제약사항
+## Limitations
 
-- 동일 프로세스 내 isolate/engine 간 통신만 지원 (크로스 프로세스 미지원)
-- 이벤트 페이로드는 JSON 직렬화 가능한 타입이어야 함 (Map, List, String, int, double, bool, null)
-- 이벤트 전달 확인(acknowledgement) 미지원
-- 브로드캐스트 방식이므로 특정 대상만 지정 불가
+- Only supports communication within the same process (no cross-process support)
+- Event payloads must be JSON-serializable (Map, List, String, int, double, bool, null)
+- No event acknowledgement support
+- Broadcast-only (cannot target specific recipients)
 
-## 문제 해결
+## Troubleshooting
 
-### 이벤트가 수신되지 않는 경우
+### Events Not Being Received
 
-1. `on()` 구독이 `emit()` 호출 전에 설정되었는지 확인
-2. 이벤트 타입 문자열이 정확히 일치하는지 확인 (대소문자 구분)
-3. 페이로드가 JSON 직렬화 가능한지 확인
+1. Ensure `on()` subscription is set up before calling `emit()`
+2. Verify event type strings match exactly (case-sensitive)
+3. Confirm payload is JSON-serializable
 
-### 메모리 누수 방지
+### Preventing Memory Leaks
 
 ```dart
 class MyWidget extends StatefulWidget {
@@ -279,40 +279,32 @@ class _MyWidgetState extends State<MyWidget> {
   void initState() {
     super.initState();
     _subscription = InterIsolateEventChannel.on('my.event').listen((data) {
-      // 이벤트 처리
+      // Handle event
     });
   }
 
   @override
   void dispose() {
-    _subscription?.cancel(); // 반드시 취소!
+    _subscription?.cancel(); // Always cancel!
     super.dispose();
   }
 }
 ```
 
-## 향후 개발 계획
+## Contributing
 
-- [ ] 이벤트 확인(acknowledgement) 지원
-- [ ] 특정 대상(들)에게만 이벤트 발송 기능
-- [ ] 멀티 프로세스 IPC 지원
-- [ ] 이벤트 우선순위 및 큐잉
-- [ ] 요청-응답 패턴 지원
+Bug reports, feature requests, and pull requests are welcome!
 
-## 기여하기
+Visit the [GitHub repository](https://github.com/minseok-joel/inter_isolate_event_channel) to submit issues or contribute.
 
-버그 리포트, 기능 제안, 풀 리퀘스트를 환영합니다!
+## License
 
-이슈를 제출하거나 기여하려면 [GitHub 저장소](https://github.com/minseok-joel/inter_isolate_event_channel)를 방문해주세요.
+This project is distributed under the MIT License. See the [LICENSE](LICENSE) file for details.
 
-## 라이선스
-
-이 프로젝트는 MIT 라이선스 하에 배포됩니다. 자세한 내용은 [LICENSE](LICENSE) 파일을 참조하세요.
-
-## 저자
+## Author
 
 Minseok Joel
 
-## 변경사항
+## Changelog
 
-변경 내역은 [CHANGELOG.md](CHANGELOG.md)를 참조하세요.
+See [CHANGELOG.md](CHANGELOG.md) for version history.
