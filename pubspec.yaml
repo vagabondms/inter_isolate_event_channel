@@ -1,7 +1,9 @@
-name: rx_event_channel
-description: "A new Flutter project."
-version: 0.0.1
-homepage:
+name: inter_isolate_event_channel
+description: "Flutter plugin for broadcasting events across multiple isolates/engines via native platform channels."
+version: 1.0.0
+homepage: https://github.com/minseok-joel/inter_isolate_event_channel
+repository: https://github.com/minseok-joel/inter_isolate_event_channel
+issue_tracker: https://github.com/minseok-joel/inter_isolate_event_channel/issues
 
 environment:
   sdk: ^3.6.0
@@ -35,10 +37,10 @@ flutter:
   plugin:
     platforms:
       android:
-        package: com.joel.rx_event_channel.rx_event_channel
-        pluginClass: RxEventChannelPlugin
+        package: com.joel.inter_isolate_event_channel.inter_isolate_event_channel
+        pluginClass: InterIsolateEventChannelPlugin
       ios:
-        pluginClass: RxEventChannelPlugin
+        pluginClass: InterIsolateEventChannelPlugin
 
   # To add assets to your plugin package, add an assets section, like this:
   # assets:

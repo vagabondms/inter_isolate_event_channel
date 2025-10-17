@@ -1,4 +1,4 @@
-group = "com.joel.rx_event_channel.rx_event_channel"
+group = "com.joel.inter_isolate_event_channel.inter_isolate_event_channel"
 version = "1.0-SNAPSHOT"
 
 buildscript {
@@ -25,7 +25,7 @@ apply plugin: "com.android.library"
 apply plugin: "kotlin-android"
 
 android {
-    namespace = "com.joel.rx_event_channel.rx_event_channel"
+    namespace = "com.joel.inter_isolate_event_channel.inter_isolate_event_channel"
 
     compileSdk = 35
 

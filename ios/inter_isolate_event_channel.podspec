@@ -1,17 +1,17 @@
 #
 # To learn more about a Podspec see http://guides.cocoapods.org/syntax/podspec.html.
-# Run `pod lib lint rx_event_channel.podspec` to validate before publishing.
+# Run `pod lib lint inter_isolate_event_channel.podspec` to validate before publishing.
 #
 Pod::Spec.new do |s|
-  s.name             = 'rx_event_channel'
-  s.version          = '0.0.1'
-  s.summary          = 'A new Flutter project.'
+  s.name             = 'inter_isolate_event_channel'
+  s.version          = '1.0.0'
+  s.summary          = 'Flutter plugin for broadcasting events across multiple isolates/engines.'
   s.description      = <<-DESC
-A new Flutter project.
+Flutter plugin for broadcasting events across multiple isolates/engines via native platform channels.
                        DESC
-  s.homepage         = 'http://example.com'
+  s.homepage         = 'https://github.com/minseok-joel/inter_isolate_event_channel'
   s.license          = { :file => '../LICENSE' }
-  s.author           = { 'Your Company' => 'email@example.com' }
+  s.author           = { 'Minseok Joel' => 'noreply@github.com' }
   s.source           = { :path => '.' }
   s.source_files = 'Classes/**/*'
   s.dependency 'Flutter'
@@ -25,5 +25,5 @@ A new Flutter project.
   # required reason APIs, update the PrivacyInfo.xcprivacy file to describe your
   # plugin's privacy impact, and then uncomment this line. For more information,
   # see https://developer.apple.com/documentation/bundleresources/privacy_manifest_files
-  # s.resource_bundles = {'rx_event_channel_privacy' => ['Resources/PrivacyInfo.xcprivacy']}
+  # s.resource_bundles = {'inter_isolate_event_channel_privacy' => ['Resources/PrivacyInfo.xcprivacy']}
 end

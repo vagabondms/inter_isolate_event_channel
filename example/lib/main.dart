@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
 
-import 'package:rx_event_channel/rx_event_channel.dart';
+import 'package:inter_isolate_event_channel/inter_isolate_event_channel.dart';
 
 void main() {
   runApp(const MyApp());
@@ -26,9 +26,19 @@ class _MyAppState extends State<MyApp> {
   void initState() {
     super.initState();
 
-    // 모든 이벤트 구독
-    InterIsolateEventChannel.on('call.invite').listen((event) {
-      final log = '수신: ${event['eventType']} - ${event['payload']}';
+    // call.invite 이벤트 구독 (Generic 타입 지정으로 타입 안정성 확보)
+    InterIsolateEventChannel.on<Map<String, dynamic>>('call.invite').listen((payload) {
+      // payload는 자동으로 Map<String, dynamic> 타입
+      final caller = payload['caller'] ?? 'Unknown';
+      final timestamp = payload['timestamp'] ?? '';
+      final log = '수신 (call.invite): caller=$caller, time=$timestamp';
+      _eventController.add(log);
+    });
+
+    // message.new 이벤트 구독 (String 타입 예제)
+    InterIsolateEventChannel.on<Map<String, dynamic>>('message.new').listen((payload) {
+      final message = payload['message'] ?? '';
+      final log = '수신 (message.new): $message';
       _eventController.add(log);
     });
 
@@ -52,16 +62,17 @@ class _MyAppState extends State<MyApp> {
     super.dispose();
   }
 
-  // 특정 이벤트 타입 구독
+  // 특정 이벤트 타입 구독 (Generic 타입으로 타입 안정성 확보)
   void _subscribeToEventType(String eventType) {
     _subscription?.cancel();
 
-    _subscription = InterIsolateEventChannel.on(eventType).listen((payload) {
+    _subscription = InterIsolateEventChannel.on<Map<String, dynamic>>(eventType).listen((payload) {
+      // payload는 타입 안전하게 Map<String, dynamic>으로 받음
       final log = '구독 이벤트($eventType): $payload';
       _eventController.add(log);
     });
 
-    _eventController.add('$eventType 이벤트 구독 시작');
+    _eventController.add('$eventType 이벤트 구독 시작 (타입: Map<String, dynamic>)');
   }
 
   // 이벤트 발생

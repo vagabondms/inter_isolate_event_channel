@@ -3,7 +3,7 @@ import UIKit
 import XCTest
 
 
-@testable import rx_event_channel
+@testable import inter_isolate_event_channel
 
 // This demonstrates a simple unit test of the Swift portion of this plugin's implementation.
 //
@@ -12,7 +12,7 @@ import XCTest
 class RunnerTests: XCTestCase {
 
   func testGetPlatformVersion() {
-    let plugin = RxEventChannelPlugin()
+    let plugin = InterIsolateEventChannelPlugin()
 
     let call = FlutterMethodCall(methodName: "getPlatformVersion", arguments: [])
 

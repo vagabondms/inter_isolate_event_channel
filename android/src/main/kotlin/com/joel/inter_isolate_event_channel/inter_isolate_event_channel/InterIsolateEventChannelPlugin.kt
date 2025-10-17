@@ -1,4 +1,4 @@
-package com.joel.rx_event_channel.rx_event_channel
+package com.joel.inter_isolate_event_channel.inter_isolate_event_channel
 
 import androidx.annotation.NonNull
 import io.flutter.embedding.engine.plugins.FlutterPlugin
@@ -9,30 +9,32 @@ import io.flutter.plugin.common.MethodChannel.MethodCallHandler
 import io.flutter.plugin.common.MethodChannel.Result
 import java.util.concurrent.CopyOnWriteArraySet
 
-/** RxEventChannelPlugin */
-class RxEventChannelPlugin: FlutterPlugin, EventChannel.StreamHandler {
-  // 이벤트 채널 (브로드캐스트용)
+/** InterIsolateEventChannelPlugin */
+class InterIsolateEventChannelPlugin: FlutterPlugin, EventChannel.StreamHandler {
+  // Event channel for broadcasting
   private lateinit var eventChannel: EventChannel
-  // 이벤트 발생용 메서드 채널
+  // Method channel for emitting events
   private lateinit var emitChannel: MethodChannel
-  
-  // 싱글톤 인스턴스 관리
+  // Current registered sink (for removal on cancel)
+  private var currentSink: EventChannel.EventSink? = null
+
+  // Singleton instance management
   companion object {
     private val instance = InterIsolateBroadcaster()
-    
+
     fun getInstance(): InterIsolateBroadcaster {
       return instance
     }
   }
 
   override fun onAttachedToEngine(@NonNull flutterPluginBinding: FlutterPlugin.FlutterPluginBinding) {
-    // 이벤트 발생용 메서드 채널
+    // Method channel for emitting events
     emitChannel = MethodChannel(flutterPluginBinding.binaryMessenger, "inter_isolate_event/emit")
     emitChannel.setMethodCallHandler { call, result ->
       if (call.method == "emitEvent") {
         val eventType = call.argument<String>("eventType")
         val payload = call.argument<Any>("payload")
-        
+
         if (eventType != null) {
           val event = mapOf(
             "eventType" to eventType,
@@ -47,8 +49,8 @@ class RxEventChannelPlugin: FlutterPlugin, EventChannel.StreamHandler {
         result.notImplemented()
       }
     }
-    
-    // 브로드캐스트 이벤트 채널
+
+    // Event channel for broadcasting
     eventChannel = EventChannel(flutterPluginBinding.binaryMessenger, "inter_isolate_event/broadcast")
     eventChannel.setStreamHandler(this)
   }
@@ -57,44 +59,57 @@ class RxEventChannelPlugin: FlutterPlugin, EventChannel.StreamHandler {
     emitChannel.setMethodCallHandler(null)
     eventChannel.setStreamHandler(null)
   }
-  
-  // EventChannel.StreamHandler 구현
+
+  // EventChannel.StreamHandler implementation
   override fun onListen(arguments: Any?, events: EventChannel.EventSink?) {
-    events?.let { 
-      getInstance().addSink(it) 
+    events?.let {
+      currentSink = it
+      getInstance().addSink(it)
     }
   }
-  
+
   override fun onCancel(arguments: Any?) {
-    // 취소 로직 간소화 - Flutter 측에서 구독 취소 시 자동으로 처리됨
-    // 실제 싱크 제거는 broadcastEvent에서 예외 발생 시 처리
+    // Explicitly remove sink to prevent memory leaks
+    currentSink?.let {
+      getInstance().removeSink(it)
+      currentSink = null
+    }
   }
 }
 
 /**
- * 모든 isolate/engine 간에 이벤트를 브로드캐스트하는 싱글톤 클래스
+ * Singleton class for broadcasting events across all isolates/engines
  */
 class InterIsolateBroadcaster {
-  // Thread-safe한 이벤트 싱크 컬렉션
+  // Thread-safe event sink collection
   private val sinks = CopyOnWriteArraySet<EventChannel.EventSink>()
-  
+
   /**
-   * 새 이벤트 싱크 등록
+   * Registers a new event sink
    */
   fun addSink(sink: EventChannel.EventSink) {
     sinks.add(sink)
   }
-  
+
   /**
-   * 모든 등록된 싱크에 이벤트 브로드캐스트
+   * Removes an event sink
+   */
+  fun removeSink(sink: EventChannel.EventSink) {
+    sinks.remove(sink)
+  }
+
+  /**
+   * Broadcasts an event to all registered sinks
    */
   fun broadcastEvent(event: Map<String, Any?>) {
-    // 모든 싱크에 이벤트 전송
-    for (sink in sinks) {
+    // Send event to all sinks
+    val iterator = sinks.iterator()
+    while (iterator.hasNext()) {
+      val sink = iterator.next()
       try {
         sink.success(event)
       } catch (e: Exception) {
-        // 실패한 싱크는 즉시 제거 (CopyOnWriteArraySet은 반복 중 제거 가능)
+        // Remove failed sinks immediately (CopyOnWriteArraySet allows removal during iteration)
         sinks.remove(sink)
       }
     }

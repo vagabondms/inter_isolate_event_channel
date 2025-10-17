@@ -1,6 +1,6 @@
-# rx_event_channel_example
+# inter_isolate_event_channel_example
 
-Demonstrates how to use the rx_event_channel plugin.
+Demonstrates how to use the inter_isolate_event_channel plugin.
 
 ## Getting Started
 

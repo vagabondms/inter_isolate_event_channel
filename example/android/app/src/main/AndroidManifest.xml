@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <application
-        android:label="rx_event_channel_example"
+        android:label="inter_isolate_event_channel_example"
         android:name="${applicationName}"
         android:icon="@mipmap/ic_launcher">
         <activity
