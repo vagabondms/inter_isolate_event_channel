@@ -1,3 +1,9 @@
+## 1.0.2
+
+### Maintenance
+
+* Version bump
+
 ## 1.0.1
 
 ### Documentation
