@@ -4,7 +4,7 @@
 #
 Pod::Spec.new do |s|
   s.name             = 'inter_isolate_event_channel'
-  s.version          = '1.0.1'
+  s.version          = '1.0.2'
   s.summary          = 'Flutter plugin for broadcasting events across multiple isolates/engines.'
   s.description      = <<-DESC
 Flutter plugin for broadcasting events across multiple isolates/engines via native platform channels.
